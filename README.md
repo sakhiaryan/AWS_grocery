@@ -57,6 +57,16 @@
 
 ##  Architecture
 
+<div align="center">
+
+
+*Generated from [`docs/architecture.py`](docs/architecture.py) with real AWS Architecture Icons*
+
+</div>
+
+<details>
+<summary> <b>Mermaid source (renders in-place on GitHub)</b></summary>
+
 ```mermaid
 flowchart TB
     User([ User Browser])
@@ -108,6 +118,8 @@ flowchart TB
     class RDS,DBC db
     class S3 storage
 ```
+
+</details>
 
 ### Traffic Flow
 
