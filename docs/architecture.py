@@ -20,7 +20,7 @@ from diagrams.aws.network import ALB, Route53, InternetGateway
 from diagrams.aws.storage import S3
 from diagrams.aws.security import IdentityAndAccessManagementIam as IAM
 from diagrams.aws.management import Cloudwatch
-from diagrams.aws.integration import Eventbridge
+from diagrams.aws.integration import Eventbridge, SimpleNotificationServiceSns as SNS
 from diagrams.aws.general import InternetAlt1
 from diagrams.onprem.container import Docker
 
@@ -73,6 +73,7 @@ with Diagram(
         eb = Eventbridge("EventBridge\n(5-min cron)")
         cw = Cloudwatch("CloudWatch\nMetrics + Alarms")
         iam = IAM("IAM Roles\n+ Policies")
+        sns = SNS("SNS Topic\nAlerts")
 
     # Traffic flow
     internet >> Edge(label="HTTP/HTTPS", color="darkgreen", penwidth="2") >> route53
@@ -88,3 +89,5 @@ with Diagram(
     [ec2_a, ec2_b] >> Edge(style="dashed") >> s3
     ec2_a >> Edge(style="dotted") >> cw
     rds >> Edge(style="dotted") >> cw
+    lam >> Edge(label="publish alert", color="red") >> sns
+    sns >> Edge(label="email", color="red", style="dashed") >> internet

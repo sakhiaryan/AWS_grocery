@@ -15,3 +15,8 @@ variable "tags" {
   type = map(string)
   default = {}
 }
+variable "sns_topic_arn" {
+  type        = string
+  default     = ""
+  description = "SNS topic ARN to publish health alerts to."
+}

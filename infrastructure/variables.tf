@@ -63,3 +63,8 @@ variable "s3_bucket_name" {
   default = ""
   description = "Leave empty for auto-generated unique name"
 }
+variable "alert_email" {
+  type        = string
+  default     = ""
+  description = "Email address that will receive health alerts via SNS. Leave empty to disable."
+}

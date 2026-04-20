@@ -59,10 +59,19 @@ module "s3" {
 }
 
 # 4) IAM (after S3, before compute/lambda)
+# 3b) SNS - alert topic (before IAM so Lambda can reference it)
+module "sns" {
+  source       = "./modules/sns"
+  project_name = var.project_name
+  alert_email  = var.alert_email
+  tags         = local.common_tags
+}
+
 module "iam" {
   source        = "./modules/iam"
   project_name  = var.project_name
   s3_bucket_arn = module.s3.bucket_arn
+  sns_topic_arn = module.sns.topic_arn
   tags          = local.common_tags
 }
 
@@ -103,5 +112,6 @@ module "lambda" {
   project_name     = var.project_name
   role_arn         = module.iam.lambda_role_arn
   target_group_arn = module.compute.target_group_arn
+  sns_topic_arn    = module.sns.topic_arn
   tags             = local.common_tags
 }

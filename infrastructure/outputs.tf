@@ -22,3 +22,8 @@ output "vpc_id" {
   description = "ID of the custom VPC"
   value       = module.vpc.vpc_id
 }
+
+output "sns_topic_arn" {
+  description = "SNS topic receiving health alerts"
+  value       = module.sns.topic_arn
+}

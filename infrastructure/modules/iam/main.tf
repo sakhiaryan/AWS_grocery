@@ -76,3 +76,25 @@ resource "aws_iam_role_policy" "lambda_describe" {
     }]
   })
 }
+
+
+# Lambda may publish to SNS (conditional on non-empty topic)
+resource "aws_iam_role_policy" "lambda_sns" {
+  count = var.sns_topic_arn != "" ? 1 : 0
+  name  = "${var.project_name}-lambda-sns"
+  role  = aws_iam_role.lambda.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["sns:Publish"]
+      Resource = var.sns_topic_arn
+    }]
+  })
+}
+
+# Lambda may also describe EC2 (for health check like PDF Chapter 08)
+resource "aws_iam_role_policy_attachment" "lambda_ec2_read" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+}

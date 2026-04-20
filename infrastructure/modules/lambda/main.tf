@@ -21,6 +21,7 @@ resource "aws_lambda_function" "health_check" {
     variables = {
       TARGET_GROUP_ARN = var.target_group_arn
       PROJECT_NAME     = var.project_name
+      SNS_TOPIC_ARN    = var.sns_topic_arn
     }
   }
 

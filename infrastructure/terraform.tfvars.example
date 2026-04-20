@@ -12,3 +12,7 @@ db_password  = "CHANGE_ME_use_strong_password"
 # asg_min     = 2
 # asg_max     = 5
 # asg_desired = 2
+
+# Email for health alerts from Lambda (SNS subscription).
+# Leave empty to skip. After apply, you must confirm the email.
+# alert_email = "you@example.com"
