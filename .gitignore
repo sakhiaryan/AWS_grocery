@@ -1,5 +1,56 @@
-.idea/aws.xml
-frontend/frontend-build.zip
-frontend/temp_extract/
-frontend/src/config.js~
+# ============ Python ============
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
 venv/
+env/
+ENV/
+.venv
+*.egg-info/
+
+# ============ Node ============
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ============ Secrets & env ============
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# ============ IDE / OS ============
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ============ Logs ============
+*.log
+logs/
+backend/logs/
+
+# ============ Database dumps ============
+*.dump
+db_backup/
+
+# ============ Terraform ============
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+crash.log
+crash.*.log
+terraform.tfvars
+*.auto.tfvars
+
+# ============ Misc ============
+*.tmp
+*.bak
+*.orig
