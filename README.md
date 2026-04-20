@@ -198,19 +198,23 @@ Three ways to run GroceryMate  pick the one that fits the use case:
 
 ##  Infrastructure-as-Code
 
-The [`infrastructure/`](infrastructure/) folder contains the entire AWS setup in **declarative Terraform**:
+The [`infrastructure/`](infrastructure/) folder contains the entire AWS setup in **modular declarative Terraform**  7 focused modules wired together by the root configuration:
 
 ```
 infrastructure/
- main.tf                   # Providers, VPC/AMI data sources
- variables.tf              # 11 configurable inputs
- security_groups.tf        # EC2 SG (22/80/5000) + RDS SG (5432 from EC2 only)
- ec2.tf                    # EC2 instance + user-data Docker bootstrap
- rds.tf                    # PostgreSQL db.t4g.micro, subnet group, encrypted
- outputs.tf                # Public IP, app URL, RDS endpoint, SSH command
- terraform.tfvars.example  # Copy  edit  terraform apply
- .gitignore                # Blocks state files + secrets
- README.md                 # Detailed Terraform usage
+ main.tf                   # Root: providers + all module wiring
+ variables.tf              # 16 configurable inputs
+ outputs.tf                # ALB DNS, RDS endpoint, S3 bucket, Lambda 
+ terraform.tfvars.example
+ .gitignore
+ modules/
+     vpc/        # Custom VPC + 2 public & 2 private subnets + IGW
+     security/   # 3 SGs (ALB  EC2  RDS), least privilege chain
+     iam/        # EC2 instance profile (SSM + S3 read), Lambda role
+     compute/    # ALB + Target Group + Launch Template + Auto Scaling Group
+     rds/        # PostgreSQL 17 in private subnets, encrypted, backups
+     s3/         # Encrypted bucket, public access blocked
+     lambda/     # Health-check Lambda + EventBridge cron (5-min)
 ```
 
 **Why Terraform?**

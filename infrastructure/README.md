@@ -1,84 +1,83 @@
-# GroceryMate Infrastructure (Terraform)
+# Infrastructure  Terraform IaC
 
-Infrastructure as Code for the GroceryMate application.
-Deploys an EC2 host running the Dockerized Flask app, plus
-a managed PostgreSQL RDS database, with firewall rules.
+Modular Terraform configuration that provisions the entire GroceryMate
+stack on AWS in one `terraform apply`.
+
+## Module Tree
+
+```
+infrastructure/
+ main.tf                # Root: wires all modules together
+ variables.tf           # 16 configurable inputs
+ outputs.tf             # ALB DNS, RDS endpoint, S3 bucket, 
+ terraform.tfvars.example
+ .gitignore
+ modules/
+     vpc/               # Custom VPC, 2 public + 2 private subnets, IGW, RT
+     security/          # 3 SGs: ALB  EC2  RDS (least privilege chain)
+     iam/               # EC2 instance profile (SSM + S3 read), Lambda role
+     compute/           # ALB + Target Group + Launch Template + Auto Scaling Group
+     rds/               # PostgreSQL 17 in private subnets, encrypted
+     s3/                # Encrypted bucket with public access block
+     lambda/            # Health-check Lambda + EventBridge cron (every 5 min)
+```
 
 ## Architecture
 
-    Internet --> EC2 SG (22, 80, 5000)
-                    |
-                 EC2 Instance (t3.micro)
-                 Docker + docker-compose
-                 GroceryMate Flask App
-                    |
-                 RDS SG (5432, from EC2 SG only)
-                    |
-                 RDS PostgreSQL (db.t4g.micro)
+```
+Internet
+   
+   
+   ALB (public subnets, 2 AZ)
+   
+   
+   Auto Scaling Group   Launch Template (EC2 + user-data Docker bootstrap)
+   
+   
+   RDS PostgreSQL (private subnets, multi-AZ ready)
 
-## Files
+   Lambda  EventBridge (5-min cron)
+      
+      
+   CloudWatch (HealthyTargetCount metric)
+```
 
-| File | Purpose |
-|------|---------|
-| `main.tf` | Provider config, VPC/subnet/AMI data sources |
-| `variables.tf` | All configurable input variables |
-| `ec2.tf` | EC2 instance + user-data bootstrap |
-| `security_groups.tf` | EC2 SG and RDS SG (least privilege) |
-| `rds.tf` | RDS DB subnet group and PostgreSQL instance |
-| `outputs.tf` | Public IP, RDS endpoint, SSH command, app URL |
-| `terraform.tfvars.example` | Template for local tfvars |
-| `.gitignore` | Prevents state and secrets from being committed |
-
-## Prerequisites
-
-1. Terraform >= 1.5 installed
-2. AWS CLI configured OR AWS SSO session active
-3. An existing EC2 key pair (default: `hello-world-key`)
+See `../docs/architecture.png` for the AWS-icon diagram.
 
 ## Usage
 
 ```bash
 cd infrastructure
 
-# 1. Copy example tfvars and fill in a real password
+# 1) Create tfvars from the template and fill in a real DB password
 cp terraform.tfvars.example terraform.tfvars
-# edit terraform.tfvars - set db_password
+$EDITOR terraform.tfvars
 
-# 2. Initialize Terraform (downloads AWS provider)
+# 2) Initialise providers (aws, archive, random)
 terraform init
 
-# 3. Validate syntax
-terraform validate
-
-# 4. Preview changes
+# 3) Preview changes
 terraform plan
 
-# 5. Apply (creates real AWS resources - costs may apply)
+# 4) Apply (creates real resources!)
 terraform apply
 
-# When you are finished:
+# 5) Destroy when done
 terraform destroy
 ```
 
 ## Outputs After Apply
 
-- `ec2_public_ip` - IPv4 to SSH into
-- `app_url` - browser URL for GroceryMate
-- `rds_endpoint` - database host:port
-- `database_url` - full PostgreSQL connection string
+- `alb_dns_name`  public hostname of the Application Load Balancer
+- `app_url`  clickable URL to open the app
+- `rds_endpoint`  database `host:port`
+- `s3_bucket`  bucket name for assets
+- `lambda_function`  name of the health-check Lambda
+- `vpc_id`  the custom VPC ID
 
-## Security Notes
+## Known Limitation (Masterschool sandbox)
 
-- `terraform.tfvars` contains the DB password - gitignored by design.
-- RDS security group only accepts traffic from the EC2 security group.
-- EBS and RDS storage are encrypted at rest.
-- SSH is open to 0.0.0.0/0 for coursework - in production restrict to
-  your IP.
-
-## Known Limitation
-
-The Masterschool AWS sandbox has a Service Control Policy (SCP)
-that denies `rds:CreateDBInstance`. Running `terraform apply`
-will succeed for EC2 + security groups but fail on the RDS
-resource. The code is production-quality and will work in any
-AWS account where RDS is permitted.
+The Masterschool AWS sandbox attaches a Service Control Policy that
+denies `rds:CreateDBInstance`. `terraform apply` succeeds for everything
+except the RDS resource. The code is production-quality and will create
+RDS in any AWS account where the service is permitted.

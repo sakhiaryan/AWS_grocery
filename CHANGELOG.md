@@ -5,8 +5,17 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/
 
 ## [Unreleased]
 
-- Polish the production architecture diagram with draw.io AWS icons.
-- Add GitHub Actions workflow for automated `terraform plan` on PRs.
+### Added
+- **Modular Terraform**  refactored `infrastructure/` into 7 focused modules (`vpc`, `security`, `iam`, `compute`, `rds`, `s3`, `lambda`).
+- **Custom VPC** with 2 public + 2 private subnets in separate AZs (replaces default VPC).
+- **Auto Scaling Group** with Launch Template  elastic capacity (min=1, max=3).
+- **Lambda + EventBridge** cron  5-minute ALB health-check publishing custom CloudWatch metrics.
+- **IAM module**  EC2 instance profile (SSM + S3 read) and Lambda execution role with least-privilege policies.
+- **AWS Architecture Icons diagram**  `docs/architecture.png` generated from `docs/architecture.py` via the `diagrams` library.
+
+### Changed
+- `README.md` now shows the AWS-icon PNG first with Mermaid as a collapsible fallback.
+- `terraform validate` runs green end-to-end on the new module tree.
 
 ---
 

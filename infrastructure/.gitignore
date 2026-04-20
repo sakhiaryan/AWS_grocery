@@ -1,4 +1,3 @@
-# Terraform state and cache
 .terraform/
 .terraform.lock.hcl
 terraform.tfstate
@@ -6,7 +5,8 @@ terraform.tfstate.backup
 crash.log
 crash.*.log
 
-# Sensitive values
 terraform.tfvars
 *.auto.tfvars
 *.pem
+
+modules/lambda/lambda_function.zip

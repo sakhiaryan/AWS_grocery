@@ -1,12 +1,14 @@
-# Copy to terraform.tfvars and fill in real values.
-# terraform.tfvars is gitignored - never commit secrets.
+# Copy to terraform.tfvars and fill real values.
+# terraform.tfvars is gitignored.
 
-aws_region        = "eu-north-1"
-environment       = "dev"
-project_name      = "grocerymate"
-ec2_instance_type = "t3.micro"
-ec2_key_name      = "hello-world-key"
-db_instance_class = "db.t4g.micro"
-db_name           = "grocerymate_db"
-db_username       = "postgres"
-db_password       = "CHANGE_ME_use_strong_password"
+aws_region   = "eu-north-1"
+project_name = "grocerymate"
+environment  = "dev"
+
+ec2_key_name = "hello-world-key"
+db_password  = "CHANGE_ME_use_strong_password"
+
+# Optional overrides:
+# asg_min     = 2
+# asg_max     = 5
+# asg_desired = 2

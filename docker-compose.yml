@@ -1,0 +1,37 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: grocery-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: grocery_user
+      POSTGRES_PASSWORD: GroceryMate2026secure
+      POSTGRES_DB: grocerymate_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/app/sqlite_dump_clean.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U grocery_user -d grocerymate_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: ./backend
+    container_name: grocery-app
+    restart: unless-stopped
+    environment:
+      JWT_SECRET_KEY: "d8e4f10fd0b2f138efb8840399274b48c0296e536c5a77a103de87bfe0c5fd6e"
+      POSTGRES_USER: grocery_user
+      POSTGRES_PASSWORD: GroceryMate2026secure
+      POSTGRES_DB: grocerymate_db
+      POSTGRES_HOST: db
+      POSTGRES_URI: "postgresql://grocery_user:GroceryMate2026secure@db:5432/grocerymate_db"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+
+volumes:
+  pgdata:
