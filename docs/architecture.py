@@ -40,7 +40,7 @@ EDGE = {"fontsize": "12", "fontname": "Arial"}
 with Diagram(
     "GroceryMate  AWS Architecture",
     filename="docs/architecture",
-    outformat="png",
+    outformat=["png","pdf","svg"],
     show=False,
     direction="TB",
     graph_attr=GRAPH,
